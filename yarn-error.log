@@ -1,5 +1,5 @@
 Arguments: 
-  /home/vagrant/.nvm/versions/node/v10.20.1/bin/node /home/vagrant/.nvm/versions/node/v10.20.1/bin/yarn add body-parser
+  /home/vagrant/.nvm/versions/node/v10.20.1/bin/node /home/vagrant/.nvm/versions/node/v10.20.1/bin/yarn add --dev nodemon
 
 PATH: 
   /home/vagrant/bin:/home/vagrant/.local/bin:/home/vagrant/.nvm/versions/node/v10.20.1/bin:/home/vagrant/.rvm/gems/ruby-2.3.5/bin:/home/vagrant/.rvm/gems/ruby-2.3.5@global/bin:/home/vagrant/.rvm/rubies/ruby-2.3.5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/vagrant/.rvm/bin:/home/vagrant/.rvm/bin

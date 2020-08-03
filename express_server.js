@@ -11,7 +11,7 @@ function generateRandomString() {
 
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8081; // default port 8080
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -40,10 +40,17 @@ app.get("/urls/new", (req, res) => {
 
 // Adding a new route
 
-app.get("/urls/:id", (req, res) => {
-    let templateVars = { shortURL: req.params.shortURL, longURL:"http://www.lighthouselabs.ca"};
+app.get("/urls/:shortURL", (req, res) => {
+    let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
   });
+
+//Redirect Short URLs
+
+app.get("/u/:shortURL", (req, res) => {
+    const longURL = urlDatabase[req.params.shortURL];  
+    res.redirect(longURL);
+});
 
 
 app.get("/", (req, res) => {

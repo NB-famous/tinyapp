@@ -1,0 +1,45 @@
+Arguments: 
+  /home/vagrant/.nvm/versions/node/v10.20.1/bin/node /home/vagrant/.nvm/versions/node/v10.20.1/bin/yarn add express
+
+PATH: 
+  /home/vagrant/bin:/home/vagrant/.local/bin:/home/vagrant/.nvm/versions/node/v10.20.1/bin:/home/vagrant/.rvm/gems/ruby-2.3.5/bin:/home/vagrant/.rvm/gems/ruby-2.3.5@global/bin:/home/vagrant/.rvm/rubies/ruby-2.3.5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/vagrant/.rvm/bin:/home/vagrant/.rvm/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  10.20.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: EPROTO: protocol error, symlink '../../../mime/cli.js' -> '/vagrant/w3/tinyapp/node_modules/send/node_modules/.bin/mime'
+
+npm manifest: 
+  {
+    "name": "tinyapp",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/NB-famous/tinyapp.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/NB-famous/tinyapp/issues"
+    },
+    "homepage": "https://github.com/NB-famous/tinyapp#readme"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

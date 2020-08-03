@@ -17,6 +17,14 @@ app.get('/urls', (req, res) =>{
     res.render("urls_index", templateVars);
 });
 
+// Adding a new route
+
+app.get("/urls/:shortURL", (req, res) => {
+    let templateVars = { shortURL: req.params.shortURL, longURL:"http://www.lighthouselabs.ca"};
+    res.render("urls_show", templateVars);
+  });
+
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });

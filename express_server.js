@@ -72,6 +72,19 @@ app.post("/urls", (req, res) => {
     res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
+// Add a POST route that removes a URL resource, update urls_index.ejs
+
+app.post("/urls/:shortURL/delete", (req, res)=>{
+
+  console.log("DELETE HERE");
+
+  const urlId = req.params.shortURL;
+
+  delete urlDatabase[urlId];
+
+  res.redirect('/urls'); 
+
+})
 
 // ADDED new route for experimental purposes//
 /*

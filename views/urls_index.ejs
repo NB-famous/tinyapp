@@ -56,8 +56,9 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %><td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn2 edit">Edit</button>
-              <td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn delete">Delete</button></form></td></td></td>
+            <td><%= urls[url] %></td>
+            <td><form method="POST" action="/urls/<%= url %>/editbut" ><button class="btn2 edit">Edit</button></form></td>
+            <td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn delete">Delete</button></form></td>
           </tr>
         <% } %>
       </tbody>

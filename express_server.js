@@ -19,7 +19,7 @@ const addNewShortUrl = (content) => {
   urlDatabase[id] = Object.values(newShort).join(" ");
 
 
-
+  //console.log(id)
   return id;
 
 };
@@ -29,14 +29,19 @@ const addNewShortUrl = (content) => {
 
 // console.log(urlDatabase)
 
+//Create a function that will update page after edit
+const updateUrl = (id, content) => {
+  urlDatabase[id] = content;
+}
 
-// Adding body parser parkage "yarn add body-parser"
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
 
 // We need to specify the template ejs using the set below. => ejs
 // create a views folder
 app.set('view engine', 'ejs');
+
+// Adding body parser parkage "yarn add body-parser"
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true}));
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
@@ -68,10 +73,10 @@ app.get("/urls.json", (req, res) => {
 
 //Adding a POST Route to Receive the Form Submission
 
-app.post("/urls", (req, res) => {
-    console.log(req.body);  // Log the POST request body to the console
-    res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});
+// app.post("/urls", (req, res) => {
+//     console.log(req.body);  // Log the POST request body to the console
+//     res.send("Ok");         // Respond with 'Ok' (we will replace this)
+// });
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 
@@ -89,17 +94,50 @@ app.post("/urls/:shortURL/delete", (req, res)=>{
 
 // Add a POST route that will redirect edit fuction to /urls/:shortURL page 
 
-app.post("/urls/:shortURL/delete", (req, res)=>{
+app.post("/urls/:shortURL/editbut", (req, res)=>{
 
   console.log("EDITING URL");
 
-  const urlId = req.params.shortURL;
+  const urlEdit = req.params.shortURL;
 
-  delete urlDatabase[urlId];
-
-  res.redirect('/urls'); 
+  res.redirect(`/urls/${urlEdit}`); 
 
 })
+
+// Add a post to edit form 
+
+app.post("/urls/:shortURL/editform", (req, res)=>{
+
+  console.log("EDITING Form");
+
+  // This code is just for reference and can be delete if you choose////
+  //console.log(Object.values(req.body).join(" "));
+  //const keys = addNewShortUrl(req.body.fname);
+  //let newDbId = urlDatabase[keys];
+
+  let keys = req.params.shortURL;
+
+  updateUrl(keys, `http://${req.body.fname}`);
+
+  res.redirect("/urls"); 
+
+});
+
+// Add a post that incorporate Add a new short url to what we have --> to be used later
+/* 
+app.post("/urls/:shortURL/editform", (req, res)=>{
+
+  console.log("EDITING Form");
+  //console.log(Object.values(req.body).join(" "));
+  const keys = addNewShortUrl(req.body.fname);
+
+  let newDb = urlDatabase[keys];
+
+  res.redirect(`/urls`); 
+
+}) 
+
+*/
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

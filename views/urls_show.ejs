@@ -8,6 +8,30 @@
 
 <body>
 
+  <style>
+    .input1{
+      padding: 6px;
+      margin-top: 8px;
+      margin-right: 16px;
+      background: #ddd;
+      font-size: 17px;
+      border: 1px solid rgb(170, 170, 170);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .submit {
+      border: 2px;
+      border-radius: 5px;
+      background-color: rgba(44, 124, 216, 0.993);
+      color: rgb(248, 237, 237);
+      padding: 10px 15px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+
+  </style>
+
   <!-- This is where you add the partial _header for both file on top of body -->
   <%- include('partials/_header') %>
 
@@ -17,7 +41,13 @@
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
-    <div class="card-footer text-muted"></div>
+    <div class="card-footer text-muted">
+      <h1>Edit</h1>
+      <form method="POST" action="/urls/<%= shortURL %>/editform" >
+        <label for="fname"><h4>New Url:</h4></label>
+        <input type="text" id="fname" class="input1 edit" name="fname"><button class="btn submit">Submit</button><br>
+      </form><br>
+    </div>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

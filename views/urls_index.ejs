@@ -13,15 +13,29 @@
   <style> 
     .btn {
       border: 2px solid black;
+      border-radius: 7px;
       background-color: white;
       color: black;
       padding: 10px 20px;
       font-size: 12px;
       cursor: pointer;
     }
-    .danger {
+    .btn2 {
+      border: 2px solid black;
+      border-radius: 5px;
+      background-color: white;
+      color: black;
+      padding: 10px 15px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .delete {
     border-color: #f44336;
     color: red;
+    }
+    .edit {
+      border-color: #2196F3;
+      color: dodgerblue
     }
   </style>
 
@@ -34,6 +48,7 @@
         <tr>
             <th scope="col">Short URL</th>
             <th scope="col">Long URL</th>
+            <th scope="col">Edit</th>
             <th scope="col">Delete</th>
         </tr>
       </thead>
@@ -41,7 +56,8 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %><td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn danger">DELETE</button></form></td></td>
+            <td><%= urls[url] %><td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn2 edit">Edit</button>
+              <td><form method="POST" action="/urls/<%= url %>/delete" ><button class="btn delete">Delete</button></form></td></td></td>
           </tr>
         <% } %>
       </tbody>

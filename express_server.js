@@ -1,14 +1,3 @@
-//Generate a Random ShortURL using a function 
-function generateRandomString() {
-
-    let randomString = Math.random().toString(30).substring(2, 8);
-
-    return randomString;
-
-}
-
-
-
 const express = require("express");
 const app = express();
 const PORT = 8081; // default port 8080
@@ -17,6 +6,28 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+//Generate a Random ShortURL using a function 
+const addNewShortUrl = (content) => {
+
+  let id = Math.random().toString(30).substring(2, 8);
+
+  const newShort = {
+    id: `http://${content}`
+  };
+
+  urlDatabase[id] = Object.values(newShort).join(" ");
+
+
+
+  return id;
+
+};
+
+// Driver code for addNewShortUrl
+// addNewShortUrl("www.facebook.com")
+
+// console.log(urlDatabase)
 
 
 // Adding body parser parkage "yarn add body-parser"
@@ -39,7 +50,6 @@ app.get("/urls/new", (req, res) => {
 });
 
 // Adding a new route
-
 app.get("/urls/:shortURL", (req, res) => {
     let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
@@ -51,15 +61,6 @@ app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];  
     res.redirect(longURL);
 });
-
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/hello", (req, res) => {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
-  });
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
@@ -86,7 +87,28 @@ app.post("/urls/:shortURL/delete", (req, res)=>{
 
 })
 
-// ADDED new route for experimental purposes//
+// Add a POST route that will redirect edit fuction to /urls/:shortURL page 
+
+app.post("/urls/:shortURL/delete", (req, res)=>{
+
+  console.log("EDITING URL");
+
+  const urlId = req.params.shortURL;
+
+  delete urlDatabase[urlId];
+
+  res.redirect('/urls'); 
+
+})
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+
+
+
+
+// ADDED new route for experimental purposes// Can be added back above listen to apply
 /*
  app.get("/set", (req, res) => {
     const a = 1;
@@ -99,6 +121,12 @@ app.get("/fetch", (req, res) => {
 
 */
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+/* 
+app.get("/", (req, res) => {
+  res.send("Hello!");
 });
+
+app.get("/hello", (req, res) => {
+    res.send("<html><body>Hello <b>World</b></body></html>\n");
+  }); 
+*/

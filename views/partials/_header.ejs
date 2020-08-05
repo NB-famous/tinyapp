@@ -9,51 +9,77 @@
         <style>
           .container {
            position: absolute;
-           right: -840px;
+           right: -700px;
+           margin: auto;
          }
+
+         .container2 {
+          position: absolute;
+          right: 130px;
+          display: inline-block;
+          vertical-align: middle;
+        }
+
           .btn3 {
 
             border: 2px solid black;
             border-radius: 5px;
+            width: 100px;
+            height: 40px;
+            margin: auto;
             opacity: 0.5;
             color:black;
-            padding: 7px 15px;
             font-size: 20px;
             cursor: pointer; 
           }
+          .btn4 {
+
+            position: absolute;
+            right: 0px;
+            margin-top:-40px ;
+            margin-right: -120px;
+            border: 2px solid black;
+            border-radius: 5px;
+            width: 100px;
+            height: 40px;
+            opacity: 0.5;
+            color:black;
+            font-size: 20px;
+            cursor: pointer;
+          
+          }
           .box {
             border: 2px;
-            padding: 10px 10px;
+            margin: auto;
+            width: 300px;
+            height: 40px;
             border-radius: 5px;
-          }
-          .logout{
-           position: absolute;
-           right: -5px;
-           padding: 6px 7px;
-          }
-          
-         </style>
-         
-        <div class="container">
-          <form method="POST" action="/login">
-            <input type="text" placeholder="Username" class="box" name="username">
-            <!--<input type="text" placeholder="Password" name="psw">-->
-            <button class="btn3 login" type="submit">Login</button>
-          </form>
-        </div>
-        <% if(username){%>
-          <div class="logout">
-            <label for="tag1"><h5>Logged In As: <%= username %></h5></label>
-            <button class="btn3 login" type="submit"> Logout </button>
-          </div>
-        <%}%>
+            font-size: 20px;
+          } 
+                 
+        </style>
         
-
-
         <div class="navbar-nav">
           <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+
+  
+            <% if(!username){ %>
+              <div class="container">
+                <form method="POST" action="/login">
+                  <input type="text" placeholder="Username" class="box" name="username">
+                  <button class="btn3 login" type="submit">Login</button>
+                </form>
+              </div>
+              <% } else{ %>  
+                <div class="container2">
+                  <form method="POST" action="/logout">
+                    <h3>Logged in as: <%= username %></h3>
+                    <button class="btn4 logout" type="submit">Logout</button>
+                  </form>
+                </div>
+            <% } %>
         </div>
       </div>
     </nav>

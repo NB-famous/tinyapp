@@ -46,6 +46,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+/* // Adding a GET route for login username
+app.get("/login", (req, res) => {
+  let templateVars = {username: req.cookies["username"]}
+  res.render("_header", templateVars);
+});
+
+// Adding a GET route for logout username
+app.get("/logout", (req, res) => {
+  let templateVars = {username: req.cookies["username"]}
+  res.render("_header", templateVars);
+}); */
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
@@ -55,13 +66,8 @@ app.get('/urls', (req, res) =>{
 
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
-});
-
-// Adding a GET route for login username
-app.get("/login", (req, res) => {
-  let templateVars = {username: req.cookies["username"]}
-  res.render("_header", templateVars);
+  let templateVars = { username: req.cookies["username"], urls:urlDatabase };
+    res.render("urls_new",templateVars);
 });
 
 // Adding a new route
@@ -141,7 +147,18 @@ app.post("/login", (req, res) => {
   console.log("ADDING USERNAME")
   let user = req.body.username;
 
-  res.cookie('username', user)
+  res.cookie('username', req.body.username)
+
+  res.redirect("/urls")
+})
+
+// Add a post that removes cookie when logged out button is pressed
+app.post("/logout", (req, res) => {
+
+  console.log("LOGGING OUT USER")
+  let user = req.body.username;
+
+  res.clearCookie('username', req.body.username)
 
   res.redirect("/urls")
 })

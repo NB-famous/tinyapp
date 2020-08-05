@@ -7,22 +7,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//Generate a Random ShortURL using a function 
-const addNewShortUrl = (content) => {
+// create an empty object to store user data pass in by the registration
+let users = {}
+
+// Generate a Random user Id to be used for our usersData base 
+const genRanId = (content) => {
 
   let id = Math.random().toString(30).substring(2, 8);
 
-  const newShort = {
-    id: `http://${content}`
-  };
-
-  urlDatabase[id] = Object.values(newShort).join(" ");
-
-
-  //console.log(id)
   return id;
-
 };
+
+
+
+
 
 // Driver code for addNewShortUrl
 // addNewShortUrl("www.facebook.com")
@@ -46,28 +44,24 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-/* // Adding a GET route for login username
-app.get("/login", (req, res) => {
-  let templateVars = {username: req.cookies["username"]}
-  res.render("_header", templateVars);
-});
 
-// Adding a GET route for logout username
-app.get("/logout", (req, res) => {
-  let templateVars = {username: req.cookies["username"]}
-  res.render("_header", templateVars);
-}); */
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/', (req, res) =>{
-    let templateVars = { username: req.cookies.username, urls:urlDatabase };
+    let templateVars = { user: users[req.cookies.user_id], urls:urlDatabase };
     res.render("urls_index", templateVars);
 });
+
+// Adding a new route to input registration and password
+app.get("/registration", (req, res) =>{
+  let templateVars = { user: users[req.cookies.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.render("urls_registration", templateVars);
+})
 
 // Adding a GET Route to Show the Form
 app.get("/new", (req, res) => {
   let templateVars = { username: req.cookies.username, urls:urlDatabase };
-  
+
     res.render("urls_new", templateVars);
 });
 
@@ -78,7 +72,6 @@ app.get("/:shortURL", (req, res) => {
   });
 
 //Redirect Short URLs
-
 app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];  
     res.redirect(longURL);
@@ -88,12 +81,6 @@ app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
   });
 
-//Adding a POST Route to Receive the Form Submission
-
-// app.post("/urls", (req, res) => {
-//     console.log(req.body);  // Log the POST request body to the console
-//     res.send("Ok");         // Respond with 'Ok' (we will replace this)
-// });
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 
@@ -127,7 +114,7 @@ app.post("/:shortURL/editform", (req, res)=>{
 
   console.log("EDITING Form");
 
-  // This code is just for reference and can be delete if you choose////
+  //This code is just for reference and can be delete if you choose////
   //console.log(Object.values(req.body).join(" "));
   //const keys = addNewShortUrl(req.body.fname);
   //let newDbId = urlDatabase[keys];
@@ -157,10 +144,33 @@ app.post("/logout", (req, res) => {
   console.log("LOGGING OUT USER")
   let user = req.body.username;
 
-  res.clearCookie('username', req.body.username)
+  res.clearCookie('user_id')
 
   res.redirect("/")
 })
+
+app.post('/registration', (req, res) => {
+
+  console.log("REGISTER NEW USER");
+
+  const username = req.body.username
+  const password = req.body.password
+  const retype = req.body.retype
+  const email = req.body.email
+
+  
+  let newId = genRanId(users[username]) 
+  
+  let newData = {id: newId, password: password, retype: retype, email: email}
+
+  users[newId] = newData
+
+  res.cookie("user_id", newId)
+
+  res.redirect("/")
+})
+
+
 
 // Add a post that incorporate Add a new short url to what we have --> to be used later
 /* 

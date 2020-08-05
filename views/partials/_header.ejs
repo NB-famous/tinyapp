@@ -63,9 +63,10 @@
           <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
           <a class="nav-item nav-link" href="/">My URLs</a>
           <a class="nav-item nav-link" href="/new">Create New URL</a>
+          <a class="nav-item nav-link" href="/registration">New User</a>
 
-  
-            <% if(!username){ %>
+          
+            <% if(!user){ %>
               <div class="container">
                 <form method="POST" action="/login">
                   <input type="text" placeholder="Username" class="box" name="username">
@@ -75,7 +76,7 @@
               <% } else{ %>  
                 <div class="container2">
                   <form method="POST" action="/logout">
-                    <h3>Logged in as: <%= username %></h3>
+                    <h3><%= user.email %></h3>
                     <button class="btn4 logout" type="submit">Logout</button>
                   </form>
                 </div>

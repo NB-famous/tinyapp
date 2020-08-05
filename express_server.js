@@ -59,20 +59,21 @@ app.get("/logout", (req, res) => {
 }); */
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
-app.get('/urls', (req, res) =>{
-    let templateVars = { username: req.cookies["username"], urls:urlDatabase };
+app.get('/', (req, res) =>{
+    let templateVars = { username: req.cookies.username, urls:urlDatabase };
     res.render("urls_index", templateVars);
 });
 
 // Adding a GET Route to Show the Form
-app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"], urls:urlDatabase };
-    res.render("urls_new",templateVars);
+app.get("/new", (req, res) => {
+  let templateVars = { username: req.cookies.username, urls:urlDatabase };
+  
+    res.render("urls_new", templateVars);
 });
 
 // Adding a new route
-app.get("/urls/:shortURL", (req, res) => {
-    let templateVars = { username: req.cookies["username"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+app.get("/:shortURL", (req, res) => {
+    let templateVars = { username: req.cookies.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
   });
 
@@ -96,7 +97,7 @@ app.get("/urls.json", (req, res) => {
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 
-app.post("/urls/:shortURL/delete", (req, res)=>{
+app.post("/:shortURL/delete", (req, res)=>{
 
   console.log("DELETE HERE");
 
@@ -104,25 +105,25 @@ app.post("/urls/:shortURL/delete", (req, res)=>{
 
   delete urlDatabase[urlId];
 
-  res.redirect('/urls'); 
+  res.redirect('/'); 
 
 })
 
 // Add a POST route that will redirect edit fuction to /urls/:shortURL page 
 
-app.post("/urls/:shortURL/editbut", (req, res)=>{
+app.post("/:shortURL/editbut", (req, res)=>{
 
   console.log("EDITING URL");
 
   const urlEdit = req.params.shortURL;
 
-  res.redirect(`/urls/${urlEdit}`); 
+  res.redirect(`/${urlEdit}`); 
 
 })
 
 // Add a post to edit form 
 
-app.post("/urls/:shortURL/editform", (req, res)=>{
+app.post("/:shortURL/editform", (req, res)=>{
 
   console.log("EDITING Form");
 
@@ -135,7 +136,7 @@ app.post("/urls/:shortURL/editform", (req, res)=>{
 
   updateUrl(keys, `http://${req.body.fname}`);
 
-  res.redirect("/urls"); 
+  res.redirect("/"); 
 
 });
 
@@ -146,10 +147,8 @@ app.post("/login", (req, res) => {
 
   console.log("ADDING USERNAME")
   let user = req.body.username;
-
   res.cookie('username', req.body.username)
-
-  res.redirect("/urls")
+  res.redirect("/")
 })
 
 // Add a post that removes cookie when logged out button is pressed
@@ -160,7 +159,7 @@ app.post("/logout", (req, res) => {
 
   res.clearCookie('username', req.body.username)
 
-  res.redirect("/urls")
+  res.redirect("/")
 })
 
 // Add a post that incorporate Add a new short url to what we have --> to be used later

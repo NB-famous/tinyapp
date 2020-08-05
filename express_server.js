@@ -26,7 +26,6 @@ const addNewShortUrl = (content) => {
 
 // Driver code for addNewShortUrl
 // addNewShortUrl("www.facebook.com")
-
 // console.log(urlDatabase)
 
 //Create a function that will update page after edit
@@ -43,6 +42,11 @@ app.set('view engine', 'ejs');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Adding cookie parser package
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
     let templateVars = { urls:urlDatabase };
@@ -52,6 +56,11 @@ app.get('/urls', (req, res) =>{
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
     res.render("urls_new");
+});
+
+// Adding a GET route for login username
+app.get("/login", (req, res) => {
+  res.render("_header");
 });
 
 // Adding a new route
@@ -122,6 +131,21 @@ app.post("/urls/:shortURL/editform", (req, res)=>{
   res.redirect("/urls"); 
 
 });
+
+
+// Add post to incorporate a login
+
+app.post("/login", (req, res) => {
+
+  console.log("ADDING USERNAME")
+  let user = req.body.username;
+
+  res.cookie(user)
+
+  console.log(user)
+
+  res.redirect("/urls")
+})
 
 // Add a post that incorporate Add a new short url to what we have --> to be used later
 /* 

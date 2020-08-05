@@ -49,7 +49,7 @@ app.use(cookieParser());
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
-    let templateVars = { urls:urlDatabase };
+    let templateVars = { username: req.cookies["username"], urls:urlDatabase };
     res.render("urls_index", templateVars);
 });
 
@@ -65,7 +65,7 @@ app.get("/login", (req, res) => {
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
-    let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    let templateVars = { username: req.cookies["username"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
   });
 

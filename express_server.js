@@ -60,7 +60,8 @@ app.get("/urls/new", (req, res) => {
 
 // Adding a GET route for login username
 app.get("/login", (req, res) => {
-  res.render("_header");
+  let templateVars = {username: req.cookies["username"]}
+  res.render("_header", templateVars);
 });
 
 // Adding a new route
@@ -140,9 +141,7 @@ app.post("/login", (req, res) => {
   console.log("ADDING USERNAME")
   let user = req.body.username;
 
-  res.cookie(user)
-
-  console.log(user)
+  res.cookie('username', user)
 
   res.redirect("/urls")
 })

@@ -55,7 +55,7 @@ app.get('/', (req, res) =>{
 //Adding a new route to input login email and password
 app.get('/login', (req, res) =>{
 
-  let templateVars = { user: users[req.cookies.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = { user: users[req.cookies.user_id], email: users[req.cookies.email], password: users[req.cookies.password], retype: users[req.cookies.retype] };
 
   res.render("urls_login", templateVars);
 
@@ -138,7 +138,36 @@ app.post("/:shortURL/editform", (req, res)=>{
 });
 
 
-// Add post to incorporate a login
+/// Add post to incorporate a login////
+
+// New login 
+app.post("/login", (req, res) => {
+  console.log("checking credentials")
+
+  const email = req.body.email
+  const password = req.body.password
+  const retype = req.body.retype
+
+  if(!email || !password){
+    console.log("missing a box")
+    res.send("Error code 400 - please input email or pass")
+  }
+
+  for(val in users){
+
+    if(email === users[val].email && password === users[val].password && retype === users[val].retype){
+      res.send("Succes")
+      console.log("succes")
+    } else {
+      res.send("Error code 400 - please input email or pass")
+      console.log("fail");
+
+    }
+
+  }
+
+  res.redirect("/")
+});
 
 ///// OLD login /////////////
 /* 
@@ -221,28 +250,3 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
-
-
-// ADDED new route for experimental purposes// Can be added back above listen to apply
-/*
- app.get("/set", (req, res) => {
-    const a = 1;
-    res.send(`a = ${a}`);
-});
-   
-app.get("/fetch", (req, res) => {
-    res.send(`a = ${a}`);
-}); 
-
-*/
-
-/* 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/hello", (req, res) => {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
-  }); 
-*/

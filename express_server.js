@@ -149,6 +149,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/")
 })
 
+
 app.post('/registration', (req, res) => {
 
   console.log("REGISTER NEW USER");
@@ -163,12 +164,56 @@ app.post('/registration', (req, res) => {
   
   let newData = {id: newId, password: password, retype: retype, email: email}
 
-  users[newId] = newData
 
-  res.cookie("user_id", newId)
+  console.log(newData)
 
-  res.redirect("/")
+
+ 
+if(!newData.email || !newData.password){
+  console.log("empty email or pass")
+  res.send("404 error")
+}
+
+for(val in users){
+  if(newData.email === users[val].email){
+    res.send("user exist")
+    console.log("check existance")
+  }
+
+}
+
+users[newId] = newData;
+
+res.cookie("user_id", newId)
+
+res.redirect("/")
+
+console.log(users)
+
+
+// if(newData.email !== users[req.cookies.email]){
+//   //success 
+//   res.cookie("user_id", newId)
+//   res.redirect("/")
+
+//   console.log(users[req.cookies.email])
+
+// } else {
+//   //failure your email already exist
+//   console.log("already existing email")
+//   res.send("Error code 400 - already existing email ")
+// }
+
+// } else{
+// // ultimate failure 
+// // forgot to put email or pass
+// console.log("forgot email or pass")
+// res.send("Error code 400 - please input email or pass")
+// } 
+
+
 })
+
 
 
 

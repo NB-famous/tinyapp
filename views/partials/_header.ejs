@@ -61,16 +61,17 @@
         <div class="navbar-nav">
           <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
           <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/new">Create New URL</a>
           <a class="nav-item nav-link" href="/registration">New User</a>
 
             <% if(!user){ %>
+              <a class="nav-item nav-link" href="/login">Create New URL</a>
               <div class="container">
                 <form method="GET" action="/login">
                   <button class="btn3" type="submit">Sign In</button>
                 </form>
               </div>
               <% } else{ %>
+              <a class="nav-item nav-link" href="/new">Create New URL</a>
                 <div class="container2">
                   <form method="POST" action="/logout">
                     <h3><%= user.email %></h3>

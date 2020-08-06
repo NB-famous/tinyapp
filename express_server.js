@@ -2,9 +2,16 @@ const express = require("express");
 const app = express();
 const PORT = 8081; // default port 8080
 
-const urlDatabase = {
+//Old database 
+/* const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+}; */
+
+//New Data base
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 // Adding cookie parser package --> no longer needed because of cookie session
@@ -32,14 +39,19 @@ const genRanId = () => {
 };
 
 
-
-// Driver code for addNewShortUrl
-// addNewShortUrl("www.facebook.com")
-// console.log(urlDatabase)
-
 //Create a function that will update page after edit
 const updateUrl = (id, content) => {
   urlDatabase[id] = content;
+}
+//Create a function that will tell if its users link or not 
+const usersLink = function (object, id) {
+  let usersObject = {};
+  for (let key in object) {
+    if (object[key].userID === id) {
+      usersObject[key] = object[key];
+    }
+  }
+  return usersObject;
 }
 
 
@@ -54,8 +66,19 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
-    let templateVars = { user: users[req.cookies.user_id], urls:urlDatabase };
+
+  const id = req.cookies.user_id;
+  const user = id ? users[id] : null;
+
+  if (user) {
+    let templateVars = { urls: usersLink(urlDatabase, id), user };
     res.render("urls_index", templateVars);
+
+  } else {
+    res.status(403).send("Please login or register first.")
+
+    return;
+  }
 });
 
 //Adding a new route to input login email and password

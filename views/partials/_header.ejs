@@ -9,7 +9,7 @@
         <style>
           .container {
            position: absolute;
-           right: -700px;
+           left: 0px;
            margin: auto;
          }
 
@@ -21,7 +21,9 @@
         }
 
           .btn3 {
-
+            position: absolute;
+            right: -150px;
+            top: 0px;
             border: 2px solid black;
             border-radius: 5px;
             width: 100px;
@@ -68,9 +70,8 @@
           
             <% if(!user){ %>
               <div class="container">
-                <form method="POST" action="/login">
-                  <input type="text" placeholder="Username" class="box" name="username">
-                  <button class="btn3 login" type="submit">Login</button>
+                <form method="GET" action="/login">
+                  <button class="btn3 login" type="submit">Sign In</button>
                 </form>
               </div>
               <% } else{ %>  
@@ -80,7 +81,7 @@
                     <button class="btn4 logout" type="submit">Logout</button>
                   </form>
                 </div>
-            <% } %>
+           <% } %>
         </div>
       </div>
     </nav>

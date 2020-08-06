@@ -52,15 +52,25 @@ app.get('/', (req, res) =>{
     res.render("urls_index", templateVars);
 });
 
+//Adding a new route to input login email and password
+app.get('/login', (req, res) =>{
+
+  let templateVars = { user: users[req.cookies.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+
+  res.render("urls_login", templateVars);
+
+});
+
 // Adding a new route to input registration and password
 app.get("/registration", (req, res) =>{
   let templateVars = { user: users[req.cookies.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_registration", templateVars);
-})
+});
+
 
 // Adding a GET Route to Show the Form
 app.get("/new", (req, res) => {
-  let templateVars = { username: req.cookies.username, urls:urlDatabase };
+  let templateVars = { user: users[req.cookies.user_id], username: req.cookies.username, urls:urlDatabase };
 
     res.render("urls_new", templateVars);
 });
@@ -69,7 +79,7 @@ app.get("/new", (req, res) => {
 app.get("/:shortURL", (req, res) => {
     let templateVars = { username: req.cookies.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
-  });
+});
 
 //Redirect Short URLs
 app.get("/u/:shortURL", (req, res) => {
@@ -130,13 +140,18 @@ app.post("/:shortURL/editform", (req, res)=>{
 
 // Add post to incorporate a login
 
+///// OLD login /////////////
+/* 
 app.post("/login", (req, res) => {
 
   console.log("ADDING USERNAME")
   let user = req.body.username;
   res.cookie('username', req.body.username)
   res.redirect("/")
-})
+})  
+*/
+
+
 
 // Add a post that removes cookie when logged out button is pressed
 app.post("/logout", (req, res) => {
@@ -165,21 +180,14 @@ app.post('/registration', (req, res) => {
   let newData = {id: newId, password: password, retype: retype, email: email}
 
 
-  console.log(newData)
-
-
- 
 if(!newData.email || !newData.password){
-  console.log("empty email or pass")
-  res.send("404 error")
+  res.send("Error code 400 - please input email or pass")
 }
 
 for(val in users){
   if(newData.email === users[val].email){
-    res.send("user exist")
-    console.log("check existance")
+    res.send("Error code 400 - already existing email ")
   }
-
 }
 
 users[newId] = newData;
@@ -187,30 +195,6 @@ users[newId] = newData;
 res.cookie("user_id", newId)
 
 res.redirect("/")
-
-console.log(users)
-
-
-// if(newData.email !== users[req.cookies.email]){
-//   //success 
-//   res.cookie("user_id", newId)
-//   res.redirect("/")
-
-//   console.log(users[req.cookies.email])
-
-// } else {
-//   //failure your email already exist
-//   console.log("already existing email")
-//   res.send("Error code 400 - already existing email ")
-// }
-
-// } else{
-// // ultimate failure 
-// // forgot to put email or pass
-// console.log("forgot email or pass")
-// res.send("Error code 400 - please input email or pass")
-// } 
-
 
 })
 

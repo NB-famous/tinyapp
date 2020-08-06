@@ -7,18 +7,29 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// Adding cookie parser package --> no longer needed because of cookie session
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+// create and use  cookie seesion;
+const cookieSession = require("cookie-session");
+app.use(cookieSession({
+  name: 'session',
+  keys:["I am not doing so well"],
+}));
+////////////////////////////
+
+
 // create an empty object to store user data pass in by the registration
 let users = {}
 
 // Generate a Random user Id to be used for our usersData base 
-const genRanId = (content) => {
+const genRanId = () => {
 
   let id = Math.random().toString(30).substring(2, 8);
 
   return id;
 };
-
-
 
 
 
@@ -40,14 +51,9 @@ app.set('view engine', 'ejs');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-// Adding cookie parser package
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
-
-
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
-app.get('/', (req, res) =>{
+app.get('/urls', (req, res) =>{
     let templateVars = { user: users[req.cookies.user_id], urls:urlDatabase };
     res.render("urls_index", templateVars);
 });
@@ -77,7 +83,7 @@ app.get("/new", (req, res) => {
 
 // Adding a new route
 app.get("/:shortURL", (req, res) => {
-    let templateVars = { username: req.cookies.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    let templateVars = { user: users[req.cookies.user_id], username: req.cookies.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
 });
 
@@ -102,7 +108,7 @@ app.post("/:shortURL/delete", (req, res)=>{
 
   delete urlDatabase[urlId];
 
-  res.redirect('/'); 
+  res.redirect('/urls'); 
 
 })
 
@@ -133,52 +139,57 @@ app.post("/:shortURL/editform", (req, res)=>{
 
   updateUrl(keys, `http://${req.body.fname}`);
 
-  res.redirect("/"); 
+  res.redirect("/urls"); 
 
 });
 
+///New post login/////
 
-/// Add post to incorporate a login////
-
-// New login 
 app.post("/login", (req, res) => {
-  console.log("checking credentials")
 
   const email = req.body.email
-  const password = req.body.password
+  const password= req.body.password
   const retype = req.body.retype
+  
+  // const password = users[req.cookies.password]
+  // const retype = users[req.cookies.retype]
+  // const email = users[req.cookies.email]
 
-  if(!email || !password){
-    console.log("missing a box")
-    res.send("Error code 400 - please input email or pass")
+  if(!email || !password || !retype){
+    res.send("missing input")
+    return;
+  } 
+
+  for (let user in users) {
+
+    const currentUser = users[user];
+
+    if (currentUser.email === email && currentUser.password === password && currentUser.retype === retype) {
+      console.log("match to a user in data base")
+      res.cookie('user_id',currentUser.id )
+      res.redirect("/urls");
+      return;
+    } 
+    
   }
 
-  for(val in users){
+  res.send("Invalid email or password combination.");
 
-    if(email === users[val].email && password === users[val].password && retype === users[val].retype){
-      res.send("Succes")
-      console.log("succes")
-    } else {
-      res.send("Error code 400 - please input email or pass")
-      console.log("fail");
+  //console.log(userId);
 
-    }
-
-  }
-
-  res.redirect("/")
 });
 
 ///// OLD login /////////////
-/* 
-app.post("/login", (req, res) => {
+
+/* app.post("/login", (req, res) => {
 
   console.log("ADDING USERNAME")
   let user = req.body.username;
   res.cookie('username', req.body.username)
-  res.redirect("/")
-})  
-*/
+  res.redirect("/login")
+
+})   */
+
 
 
 
@@ -186,11 +197,12 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
 
   console.log("LOGGING OUT USER")
-  let user = req.body.username;
+  let user = req.body.id;
 
   res.clearCookie('user_id')
+  //res.clearCookie('username', req.body.username)
 
-  res.redirect("/")
+  res.redirect("/urls")
 })
 
 
@@ -204,7 +216,7 @@ app.post('/registration', (req, res) => {
   const email = req.body.email
 
   
-  let newId = genRanId(users[username]) 
+  let newId = genRanId() 
   
   let newData = {id: newId, password: password, retype: retype, email: email}
 
@@ -216,16 +228,19 @@ if(!newData.email || !newData.password){
 for(val in users){
   if(newData.email === users[val].email){
     res.send("Error code 400 - already existing email ")
+    return;
   }
 }
-
-users[newId] = newData;
-
-res.cookie("user_id", newId)
-
-res.redirect("/")
+  
+  users[newId] = newData;
+  res.cookie("user_id", newId)
+  res.redirect("/urls")
+    //res.cookie("user_id", newId)
 
 })
+
+
+
 
 
 

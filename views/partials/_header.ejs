@@ -1,84 +1,80 @@
 <header>
+
+  <style>
+
+    .collapse{
+      position: relative;
+    }
+
+    .container {
+      position: absolute;
+      right: 130px;
+      display: inline-block;
+      vertical-align: middle;
+   }
+
+   .btn3 {
+    position: absolute;
+    right: -120px;
+    padding: 2px 7px;
+    top: 0px;
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 100px;
+    height: 40px;
+    opacity: 0.5;
+    color:black;
+    font-size: 20px;
+    cursor: pointer; 
+  }
+
+   .container2 {
+    position: absolute;
+    right: 130px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+    .btn4 {
+
+      position: absolute;
+      right: 0px;
+      margin-top:-40px ;
+      margin-right: -120px;
+      border: 2px solid black;
+      border-radius: 5px;
+      width: 100px;
+      height: 40px;
+      opacity: 0.5;
+      color:black;
+      font-size: 20px;
+      cursor: pointer;
+    
+    } 
+  </style>
+
     <nav class="navbar navbar-expand-md navbar-dark bg-success">
-      <a class="navbar-brand" href="/">TinyApp</a>
+      <a class="navbar-brand" href="/urls">TinyApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-
-        <style>
-          .container {
-           position: absolute;
-           left: 0px;
-           margin: auto;
-         }
-
-         .container2 {
-          position: absolute;
-          right: 130px;
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-          .btn3 {
-            position: absolute;
-            right: -150px;
-            top: 0px;
-            border: 2px solid black;
-            border-radius: 5px;
-            width: 100px;
-            height: 40px;
-            margin: auto;
-            opacity: 0.5;
-            color:black;
-            font-size: 20px;
-            cursor: pointer; 
-          }
-          .btn4 {
-
-            position: absolute;
-            right: 0px;
-            margin-top:-40px ;
-            margin-right: -120px;
-            border: 2px solid black;
-            border-radius: 5px;
-            width: 100px;
-            height: 40px;
-            opacity: 0.5;
-            color:black;
-            font-size: 20px;
-            cursor: pointer;
-          
-          }
-          .box {
-            border: 2px;
-            margin: auto;
-            width: 300px;
-            height: 40px;
-            border-radius: 5px;
-            font-size: 20px;
-          } 
-                 
-        </style>
-        
         <div class="navbar-nav">
           <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
-          <a class="nav-item nav-link" href="/">My URLs</a>
+          <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/new">Create New URL</a>
           <a class="nav-item nav-link" href="/registration">New User</a>
 
-          
             <% if(!user){ %>
               <div class="container">
                 <form method="GET" action="/login">
-                  <button class="btn3 login" type="submit">Sign In</button>
+                  <button class="btn3" type="submit">Sign In</button>
                 </form>
               </div>
-              <% } else{ %>  
+              <% } else{ %>
                 <div class="container2">
                   <form method="POST" action="/logout">
                     <h3><%= user.email %></h3>
-                    <button class="btn4 logout" type="submit">Logout</button>
+                    <button class="btn4" type="submit">Logout</button>
                   </form>
                 </div>
            <% } %>

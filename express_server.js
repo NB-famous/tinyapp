@@ -1,23 +1,34 @@
 const express = require("express");
+//const cookieParser = require('cookie-parser');
+const cookieSession = require("cookie-session");
+const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8081; // default port 8080
 
-const urlDatabase = {
+//Old database 
+/* const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+}; */
+
+//New Data base
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
-// Adding cookie parser package --> no longer needed because of cookie session
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
+// We need to specify the template ejs using the set below. => ejs
+// create a views folder
+app.set('view engine', 'ejs');
 
-// create and use  cookie seesion;
-const cookieSession = require("cookie-session");
+//app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys:["I am not doing so well"],
 }));
-////////////////////////////
+app.use(bodyParser.urlencoded({extended: true}));
+
 
 
 // create an empty object to store user data pass in by the registration
@@ -32,36 +43,56 @@ const genRanId = () => {
 };
 
 
-
-// Driver code for addNewShortUrl
-// addNewShortUrl("www.facebook.com")
-// console.log(urlDatabase)
-
 //Create a function that will update page after edit
 const updateUrl = (id, content) => {
   urlDatabase[id] = content;
 }
+//Create a function that will tell if its users link or not 
+const usersLink = function (object, id) {
+  let usersObject = {};
+  for (let key in object) {
+    if (object[key].userID === id) {
+      usersObject[key] = object[key];
+    }
+  }
+  return usersObject;
+}
 
+//// create a function which returns the URLs where the userID is equal to the id of the currently logged-in user
 
-// We need to specify the template ejs using the set below. => ejs
-// create a views folder
-app.set('view engine', 'ejs');
-
-// Adding body parser parkage "yarn add body-parser"
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
+// const urlsForUser = function (id) {
+//   let arr = Object.values(urlDatabase)
+//   let urlArr = [];
+//   for (let val of arr) {
+//     if (val.userID === id) {
+//       urlArr.push(item.longURL);
+//     }
+//   }
+//   return urlArr;
+// }
 
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) =>{
-    let templateVars = { user: users[req.cookies.user_id], urls:urlDatabase };
+
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+
+  if (user) {
+    let templateVars = { urls: usersLink(urlDatabase, id), user };
     res.render("urls_index", templateVars);
+
+  } else {
+    res.status(403).send("Please login or register first.")
+
+    return;
+  }
 });
 
 //Adding a new route to input login email and password
 app.get('/login', (req, res) =>{
 
-  let templateVars = { user: users[req.cookies.user_id], email: users[req.cookies.email], password: users[req.cookies.password], retype: users[req.cookies.retype] };
+  let templateVars = { user: users[req.session.user_id], email: users[req.session.email], password: users[req.session.password], retype: users[req.session.retype] };
 
   res.render("urls_login", templateVars);
 
@@ -69,21 +100,21 @@ app.get('/login', (req, res) =>{
 
 // Adding a new route to input registration and password
 app.get("/registration", (req, res) =>{
-  let templateVars = { user: users[req.cookies.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = { user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_registration", templateVars);
 });
 
 
 // Adding a GET Route to Show the Form
 app.get("/new", (req, res) => {
-  let templateVars = { user: users[req.cookies.user_id], username: req.cookies.username, urls:urlDatabase };
+  let templateVars = { user: users[req.session.user_id], username: req.session.username, urls:urlDatabase };
 
     res.render("urls_new", templateVars);
 });
 
 // Adding a new route
 app.get("/:shortURL", (req, res) => {
-    let templateVars = { user: users[req.cookies.user_id], username: req.cookies.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    let templateVars = { user: users[req.session.user_id], username: req.session.username, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
 });
 
@@ -127,13 +158,7 @@ app.post("/:shortURL/editbut", (req, res)=>{
 // Add a post to edit form 
 
 app.post("/:shortURL/editform", (req, res)=>{
-
   console.log("EDITING Form");
-
-  //This code is just for reference and can be delete if you choose////
-  //console.log(Object.values(req.body).join(" "));
-  //const keys = addNewShortUrl(req.body.fname);
-  //let newDbId = urlDatabase[keys];
 
   let keys = req.params.shortURL;
 
@@ -144,16 +169,15 @@ app.post("/:shortURL/editform", (req, res)=>{
 });
 
 ///New post login/////
-
 app.post("/login", (req, res) => {
 
   const email = req.body.email
   const password= req.body.password
   const retype = req.body.retype
   
-  // const password = users[req.cookies.password]
-  // const retype = users[req.cookies.retype]
-  // const email = users[req.cookies.email]
+  // const password = users[req.session.password]
+  // const retype = users[req.session.retype]
+  // const email = users[req.session.email]
 
   if(!email || !password || !retype){
     res.send("missing input")
@@ -164,9 +188,10 @@ app.post("/login", (req, res) => {
 
     const currentUser = users[user];
 
-    if (currentUser.email === email && currentUser.password === password && currentUser.retype === retype) {
+    if (currentUser.email === email && bcrypt.compareSync(password, currentUser.password) && bcrypt.compareSync(retype, currentUser.retype)) {
       console.log("match to a user in data base")
-      res.cookie('user_id',currentUser.id )
+      //res.cookie('user_id',currentUser.id )
+      req.session.user_id = currentUser.id
       res.redirect("/urls");
       return;
     } 
@@ -175,23 +200,9 @@ app.post("/login", (req, res) => {
 
   res.send("Invalid email or password combination.");
 
-  //console.log(userId);
+
 
 });
-
-///// OLD login /////////////
-
-/* app.post("/login", (req, res) => {
-
-  console.log("ADDING USERNAME")
-  let user = req.body.username;
-  res.cookie('username', req.body.username)
-  res.redirect("/login")
-
-})   */
-
-
-
 
 // Add a post that removes cookie when logged out button is pressed
 app.post("/logout", (req, res) => {
@@ -199,10 +210,13 @@ app.post("/logout", (req, res) => {
   console.log("LOGGING OUT USER")
   let user = req.body.id;
 
-  res.clearCookie('user_id')
+  //res.clearCookie('user_id')
   //res.clearCookie('username', req.body.username)
 
-  res.redirect("/urls")
+  // res.clearCookie(req.session.user_id)
+  req.session = null
+
+  res.redirect("/login")
 })
 
 
@@ -218,10 +232,10 @@ app.post('/registration', (req, res) => {
   
   let newId = genRanId() 
   
-  let newData = {id: newId, password: password, retype: retype, email: email}
+  let newData = {id: newId, password: bcrypt.hashSync(password, 4), retype: bcrypt.hashSync(password, 4), email: email}
 
 
-if(!newData.email || !newData.password){
+if(!newData.email || !newData.password || !newData.retype){
   res.send("Error code 400 - please input email or pass")
 }
 
@@ -231,11 +245,13 @@ for(val in users){
     return;
   }
 }
-  
+
   users[newId] = newData;
-  res.cookie("user_id", newId)
+  //res.cookie("user_id", newId)
+  req.session.user_id = newId
   res.redirect("/urls")
-    //res.cookie("user_id", newId)
+  
+  console.log(users)
 
 })
 

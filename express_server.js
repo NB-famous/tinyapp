@@ -6,18 +6,6 @@ const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8081; //// note that i changed this to 8081 not 8080 
 
-<<<<<<< HEAD
-//Old database 
-/* const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-}; */
-
-//New Data base
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
-=======
 
 //New Data base
 const urlDatabase = {
@@ -29,7 +17,6 @@ const urlDatabase = {
     longURL: "https://www.google.ca",
     userID: "aJ48lW"
   }
->>>>>>> modifying
 };
 
 // We need to specify the template ejs using the set below. => ejs
@@ -41,7 +28,6 @@ app.use(cookieSession({
   name: 'session',
   keys: ["I am not doing so well"],
 }));
-
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -74,16 +60,6 @@ const usersLink = function (object, id) {
   }
   return usersObject;
 }
-//Create a function that will tell if its users link or not 
-const usersLink = function (object, id) {
-  let usersObject = {};
-  for (let key in object) {
-    if (object[key].userID === id) {
-      usersObject[key] = object[key];
-    }
-  }
-  return usersObject;
-}
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) => {
@@ -95,28 +71,13 @@ app.get('/urls', (req, res) => {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
-      error:"Please login or register as new user...."
+      error:""
     };
     
     res.render("urls_index", templateVars);
 
   } else {
 
-<<<<<<< HEAD
-// add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
-app.get('/urls', (req, res) =>{
-
-  const id = req.cookies.user_id;
-  const user = id ? users[id] : null;
-
-  if (user) {
-    let templateVars = { urls: usersLink(urlDatabase, id), user };
-    res.render("urls_index", templateVars);
-
-  } else {
-    res.status(403).send("Please login or register first.")
-
-=======
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
@@ -124,7 +85,6 @@ app.get('/urls', (req, res) =>{
     };
     res.render("urls_index", templateVars);
     //res.status(403).send("Please login or register first.")
->>>>>>> modifying
     return;
   }
 });

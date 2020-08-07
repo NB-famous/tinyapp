@@ -43,10 +43,11 @@
       </div>
     <div class="card-footer text-muted">
       <h1>Edit</h1>
-      <form method="POST" action="/urls/<%= shortURL %>/editform" >
+      <form method="POST" action="">
         <label for="fname"><h4>New Url:</h4></label>
-        <input type="text" id="fname" class="input1 edit" name="fname"><button class="btn submit">Submit</button><br>
-      </form><br>
+        <input type="url" id="fname" class="input1 edit" name="fname">
+        <button class="btn submit" type="submit">Submit</button>
+      </form>
     </div>
   </div>
   <!-- Bootstrap JS -->

@@ -143,8 +143,8 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//Redirect Short URLs
-app.get("/u/:shortURL", (req, res) => {
+//Redirect back to the website associated to the short url
+app.get(":longURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });

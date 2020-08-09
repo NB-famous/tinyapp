@@ -59,7 +59,7 @@
       <tbody style="margin: 1em;">
         <% for(let shortURL in urls) { %>
           <tr>
-            <td><%= shortURL %></td>
+            <td><a href="<%= urls[shortURL].longURL %>"><%= shortURL %></a></td>
 
             <td><%= urls[shortURL].longURL %></td>
             <td>

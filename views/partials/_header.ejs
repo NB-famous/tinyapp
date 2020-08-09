@@ -61,19 +61,19 @@
         <div class="navbar-nav">
           <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
           <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/registration">New User</a>
+          <a class="nav-item nav-link" href="/urls/register">New User</a>
 
             <% if(!user){ %>
-              <a class="nav-item nav-link" href="/login">Create New URL</a>
+              <a class="nav-item nav-link" href="/urls/login">Create New URL</a>
               <div class="container">
-                <form method="GET" action="/login">
+                <form method="GET" action="/urls/login">
                   <button class="btn3" type="submit">Sign In</button>
                 </form>
               </div>
               <% } else{ %>
-              <a class="nav-item nav-link" href="/new">Create New URL</a>
+              <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
                 <div class="container2">
-                  <form method="POST" action="/logout">
+                  <form method="POST" action="/urls/logout">
                     <h3><%= user.email %> Is currently logged in!</h3>
                     <button class="btn4" type="submit">Logout</button>
                   </form>

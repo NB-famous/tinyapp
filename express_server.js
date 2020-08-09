@@ -1,11 +1,9 @@
 const express = require("express");
-//const cookieParser = require('cookie-parser');
 const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8081; //// note that i changed this to 8081 not 8080 
-
 
 //New Data base
 const urlDatabase = {
@@ -22,12 +20,12 @@ const urlDatabase = {
 // We need to specify the template ejs using the set below. => ejs
 // create a views folder
 app.set('view engine', 'ejs');
-
-//app.use(cookieParser());
+//Mofied cookie-parser to using cookie-session
 app.use(cookieSession({
   name: 'session',
   keys: ["I am not doing so well"],
 }));
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -90,7 +88,7 @@ app.get('/urls', (req, res) => {
 });
 
 //Adding a new route to input login email and password
-app.get('/login', (req, res) => {
+app.get('/urls/login', (req, res) => {
 
   let templateVars = {
     user: users[req.session.user_id],
@@ -102,7 +100,7 @@ app.get('/login', (req, res) => {
 });
 
 // Adding a new route to input registration and password
-app.get("/registration", (req, res) => {
+app.get("/urls/register", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
@@ -111,9 +109,8 @@ app.get("/registration", (req, res) => {
   res.render("urls_registration", templateVars);
 });
 
-
 //Adding a GET Route to Show the Form
-app.get("/new", (req, res) => {
+app.get("/urls/new", (req, res) => {
 
   if (!req.session.user_id) {
     return res.redirect('login');
@@ -126,6 +123,7 @@ app.get("/new", (req, res) => {
   };
   res.render("urls_new", templateVars);
 });
+
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
@@ -143,14 +141,11 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
 //Redirect back to the website associated to the short url
 app.get(":longURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 // Post that add new short url for user 
@@ -167,79 +162,7 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls');
 })
 
-
-// Add a POST route that removes a URL resource, update urls_index.ejs
-app.post("/urls/:shortURL/delete", (req, res) => {
-
-  console.log("DELETE HERE");
-
-  const urlId = req.params.shortURL;
-
-  delete urlDatabase[urlId];
-  
-  res.redirect("/urls");
-});
-
-
-// Add a post to edit form 
-app.post("/urls/:shortURL", (req, res) => {
-  console.log("EDITING Form");
-
-  const shortURL = req.params.shortURL;
-  const longURL = req.body.fname;
-  updateUrl(shortURL, longURL);
-
-  res.redirect("/urls");
-});
-
-///New post login/////
-app.post("/login", (req, res) => {
-
-  const email = req.body.email
-  const password = req.body.password
-  const retype = req.body.retype
-
-
-  if (!email || !password || !retype) {
-
-    res.status(403).send("403 ERROR FOUND: Missing a value input.....")
-
-    return;
-  }
-
-  for (let user in users) {
-
-    const currentUser = users[user];
-    const passEncrypt = bcrypt.compareSync(password, currentUser.password);
-    const reEncrypt = bcrypt.compareSync(retype, currentUser.retype)
-
-    if (currentUser.email === email && passEncrypt && reEncrypt) {
-
-      //console.log("match to a user in data base")
-      req.session.user_id = currentUser.id
-      res.redirect("/urls");
-
-      return;
-    }
-  }
-
-  
-  res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
-
-});
-
-// Add a post that removes cookie when logged out button is pressed
-app.post("/logout", (req, res) => {
-
-  console.log("LOGGING OUT USER")
-  let user = req.body.id;
-  req.session = null; // to delete cookies in session library 
-
-  res.redirect("/login")
-})
-
-
-app.post('/registration', (req, res) => {
+app.post('/urls/register', (req, res) => {
 
   console.log("REGISTER NEW USER");
 
@@ -278,6 +201,76 @@ app.post('/registration', (req, res) => {
 
 })
 
+///New post login/////
+app.post("/urls/login", (req, res) => {
+
+  const email = req.body.email
+  const password = req.body.password
+  const retype = req.body.retype
+
+
+  if (!email || !password || !retype) {
+
+    res.status(403).send("403 ERROR FOUND: Missing a value input.....")
+
+    return;
+  }
+
+  for (let user in users) {
+
+    const currentUser = users[user];
+    const passEncrypt = bcrypt.compareSync(password, currentUser.password);
+    const reEncrypt = bcrypt.compareSync(retype, currentUser.retype)
+
+    if (currentUser.email === email && passEncrypt && reEncrypt) {
+
+      //console.log("match to a user in data base")
+      req.session.user_id = currentUser.id
+      res.redirect("/urls");
+
+      return;
+    }
+  }
+
+  
+  res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
+
+});
+
+// Add a post that removes cookie when logged out button is pressed
+app.post("/urls/logout", (req, res) => {
+
+  console.log("LOGGING OUT USER")
+  let user = req.body.id;
+  req.session = null; // to delete cookies in session library 
+
+  res.redirect("/urls/login")
+})
+
+
+// Add a POST route that removes a URL resource, update urls_index.ejs
+app.post("/urls/:shortURL/delete", (req, res) => {
+
+  console.log("DELETE HERE");
+
+  const urlId = req.params.shortURL;
+
+  delete urlDatabase[urlId];
+  
+  res.redirect("/urls");
+});
+
+
+// Add a post to edit form 
+app.post("/urls/:shortURL", (req, res) => {
+  console.log("EDITING Form");
+
+  const shortURL = req.params.shortURL;
+  const longURL = req.body.fname;
+  updateUrl(shortURL, longURL);
+
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Tinyapp listening on port ${PORT}!`);

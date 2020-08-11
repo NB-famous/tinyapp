@@ -56,6 +56,16 @@ const usersLink = function(object, id) {
   return usersObject;
 };
 
+app.get('/', (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect('/login');
+    return;
+  } else {
+    res.redirect('/urls');
+    return;
+  }
+});
+
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) => {
 
@@ -66,25 +76,22 @@ app.get('/urls', (req, res) => {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
-      error:""
+      error: ""
     };
-    
     res.render("urls_index", templateVars);
-
   } else {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
-      error:"Please login or register as new user...."
+      error: "Please login or register as new user...."
     };
     res.render("urls_index", templateVars);
-    //res.status(403).send("Please login or register first.")
     return;
   }
 });
 
 // Adding a new route to input login email and password
-app.get('/urls/login', (req, res) => {
+app.get('/login', (req, res) => {
 
   let templateVars = {
     user: users[req.session.user_id],
@@ -96,7 +103,7 @@ app.get('/urls/login', (req, res) => {
 });
 
 // Adding a new route to input registration and password
-app.get("/urls/register", (req, res) => {
+app.get("/register", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
@@ -109,9 +116,8 @@ app.get("/urls/register", (req, res) => {
 app.get("/urls/new", (req, res) => {
 
   if (!req.session.user_id) {
-    return res.redirect('login');
+    res.status(401).send("ERROR: You're not log in");
   }
-
   let templateVars = {
     user: users[req.session.user_id],
     username: req.session.username,
@@ -122,28 +128,49 @@ app.get("/urls/new", (req, res) => {
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]["longURL"];
-  if (!longURL) {
-    console.error(`Long URL not found in database!  Make sure that the POST request actually added to the databse`);
-    console.log(urlDatabase);
+
+  if (!req.session.user_id) {
+    res.status(401).send("ERROR FOUND: This id does not belong to you...");
+    return;
+  } else if (!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("ERROR FOUND: This url does not exist...");
   }
+
+  if (!urlDatabase[req.params.shortURL]["longURL"]) {
+    res.send('LongURL not found in database!');
+  }
+
+  const id = req.session.user_id;
+  const links = usersLink(urlDatabase, id);
+
+  if (!links[req.params.shortURL]) {
+    res.status(403).send("ERROR FOUND: This shortURL does not belong to this user......");
+    return;
+  }
+
   let templateVars = {
     user: users[req.session.user_id],
     username: req.session.username,
     shortURL: req.params.shortURL,
-    longURL: longURL
+    longURL: urlDatabase[req.params.shortURL]["longURL"]
   };
   res.render("urls_show", templateVars);
 });
 
 // Redirect back to the website associated to the short url
-app.get(":longURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+app.get("/u/:shortURL", (req, res) => {
+
+  if (!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("ERROR FOUND: This url does not exist...");
+  } else {
+    const longURL = urlDatabase[req.params.shortURL]["longURL"];
+    res.redirect(longURL);
+  }
 });
 
 // Post that add new short url for user
 app.post("/urls", (req, res) => {
+
   const longURL = req.body.longURL;
   const shortURL = genRanId();
 
@@ -151,15 +178,11 @@ app.post("/urls", (req, res) => {
     longURL: longURL,
     userID: req.session.user_id
   };
-
   res.redirect('/urls');
 });
 
-app.post('/urls/register', (req, res) => {
+app.post('/register', (req, res) => {
 
-  console.log("REGISTER NEW USER");
-
-  const username = req.body.username;
   const password = req.body.password;
   const retype = req.body.retype;
   const email = req.body.email;
@@ -173,14 +196,17 @@ app.post('/urls/register', (req, res) => {
     email: email
   };
 
-
-  if (!newData.email || !newData.password || !newData.retype) {
-    res.status(400).send("400 ERROR CODE FOUND: please input missing email or password..........");
+  if (!email || !password || !retype) {
+    res.status(400).send("400 ERROR CODE FOUND: Please input missing email or password...");
+    return;
+  } else if (password !== retype) {
+    res.status(400).send("400 ERROR FOUND:Invalid email or password combination...");
+    return;
   }
 
   for (let val in users) {
     if (newData.email === users[val].email) {
-      res.status(400).send("400 ERROR CODE FOUND: This Email already exist, please try again..........");
+      res.status(400).send("400 ERROR CODE FOUND: This email already exist, please try again...");
       return;
     }
   }
@@ -188,12 +214,11 @@ app.post('/urls/register', (req, res) => {
   users[newId] = newData;
   req.session.user_id = newId;
   res.redirect("/urls");
-  console.log(users);
 
 });
 
 // Add a post login route that enable users to input their info.
-app.post("/urls/login", (req, res) => {
+app.post("/login", (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
@@ -224,19 +249,16 @@ app.post("/urls/login", (req, res) => {
 });
 
 // Add a post that removes cookie when logged out button is pressed
-app.post("/urls/logout", (req, res) => {
+app.post("/logout", (req, res) => {
 
-  console.log("LOGGING OUT USER");
   req.session = null; // to delete cookies in session library
-  res.redirect("/urls/login");
+  res.redirect("/login");
 
 });
-
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 app.post("/urls/:shortURL/delete", (req, res) => {
 
-  console.log("DELETE HERE");
   const urlId = req.params.shortURL;
   delete urlDatabase[urlId];
   res.redirect("/urls");
@@ -246,7 +268,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Add a post to edit form
 app.post("/urls/:shortURL", (req, res) => {
 
-  console.log("EDITING Form");
   const shortURL = req.params.shortURL;
   const longURL = req.body.fname;
   updateUrl(shortURL, longURL);
@@ -254,6 +275,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 });
 
+// Visual Cue that the server is listening.
 app.listen(PORT, () => {
   console.log(`Tinyapp listening on port ${PORT}!`);
 });

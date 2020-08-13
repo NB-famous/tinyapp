@@ -55,7 +55,6 @@ const usersLink = function(object, id) {
   }
   return usersObject;
 };
-
 app.get('/', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/login');
@@ -68,10 +67,8 @@ app.get('/', (req, res) => {
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) => {
-
   const id = req.session.user_id;
   const user = id ? users[id] : null;
-
   if (user) {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
@@ -92,7 +89,6 @@ app.get('/urls', (req, res) => {
 
 // Adding a new route to input login email and password
 app.get('/login', (req, res) => {
-
   let templateVars = {
     user: users[req.session.user_id],
     email: users[req.session.email],
@@ -114,7 +110,6 @@ app.get("/register", (req, res) => {
 
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-
   if (!req.session.user_id) {
     res.status(401).send("ERROR: You're not log in");
   }
@@ -128,18 +123,15 @@ app.get("/urls/new", (req, res) => {
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
-
   if (!req.session.user_id) {
     res.status(401).send("ERROR FOUND: This id does not belong to you...");
     return;
   } else if (!urlDatabase[req.params.shortURL]) {
     res.status(404).send("ERROR FOUND: This url does not exist...");
   }
-
   if (!urlDatabase[req.params.shortURL]["longURL"]) {
     res.send('LongURL not found in database!');
   }
-
   const id = req.session.user_id;
   const links = usersLink(urlDatabase, id);
 
@@ -159,7 +151,6 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Redirect back to the website associated to the short url
 app.get("/u/:shortURL", (req, res) => {
-
   if (!urlDatabase[req.params.shortURL]) {
     res.status(404).send("ERROR FOUND: This url does not exist...");
   } else {
@@ -170,10 +161,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Post that add new short url for user
 app.post("/urls", (req, res) => {
-
   const longURL = req.body.longURL;
   const shortURL = genRanId();
-
   urlDatabase[shortURL] = {
     longURL: longURL,
     userID: req.session.user_id
@@ -182,20 +171,16 @@ app.post("/urls", (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-
   const password = req.body.password;
   const retype = req.body.retype;
   const email = req.body.email;
-
   let newId = genRanId();
-
   let newData = {
     id: newId,
     password: bcrypt.hashSync(password, 4),
     retype: bcrypt.hashSync(password, 4),
     email: email
   };
-
   if (!email || !password || !retype) {
     res.status(400).send("400 ERROR CODE FOUND: Please input missing email or password...");
     return;
@@ -210,69 +195,52 @@ app.post('/register', (req, res) => {
       return;
     }
   }
-
   users[newId] = newData;
   req.session.user_id = newId;
   res.redirect("/urls");
-
 });
 
 // Add a post login route that enable users to input their info.
 app.post("/login", (req, res) => {
-
   const email = req.body.email;
   const password = req.body.password;
   const retype = req.body.retype;
-
   if (!email || !password || !retype) {
-
     res.status(403).send("403 ERROR FOUND: Missing a value input.....");
     return;
-
   }
-
   for (let user in users) {
-
     const currentUser = users[user];
     const passEncrypt = bcrypt.compareSync(password, currentUser.password);
     const reEncrypt = bcrypt.compareSync(retype, currentUser.retype);
-
     if (currentUser.email === email && passEncrypt && reEncrypt) {
       req.session.user_id = currentUser.id;
       res.redirect("/urls");
       return;
     }
   }
-
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
-
 });
 
 // Add a post that removes cookie when logged out button is pressed
 app.post("/logout", (req, res) => {
-
   req.session = null; // to delete cookies in session library
   res.redirect("/login");
-
 });
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 app.post("/urls/:shortURL/delete", (req, res) => {
-
   const urlId = req.params.shortURL;
   delete urlDatabase[urlId];
   res.redirect("/urls");
-
 });
 
 // Add a post to edit form
 app.post("/urls/:shortURL", (req, res) => {
-
   const shortURL = req.params.shortURL;
   const longURL = req.body.fname;
   updateUrl(shortURL, longURL);
   res.redirect("/urls");
-
 });
 
 // Visual Cue that the server is listening.

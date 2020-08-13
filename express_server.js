@@ -141,6 +141,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   if (!urlDatabase[req.params.shortURL]["longURL"]) {
     res.send('LongURL not found in database!');
+<<<<<<< HEAD
   }
   const id = req.session.user_id;
   const links = usersLink(urlDatabase, id);
@@ -149,6 +150,16 @@ app.get("/urls/:shortURL", (req, res) => {
     res.status(403).send("ERROR FOUND: This shortURL does not belong to this user......");
     return;
   }
+=======
+  }
+  const id = req.session.user_id;
+  const links = usersLink(urlDatabase, id);
+
+  if (!links[req.params.shortURL]) {
+    res.status(403).send("ERROR FOUND: This shortURL does not belong to this user......");
+    return;
+  }
+>>>>>>> 9798d9d2e8b1a8d651f302325d8e511a7fdd4b8e
 
   let templateVars = {
     user: users[req.session.user_id],
@@ -230,7 +241,10 @@ app.post("/login", (req, res) => {
     } 
   
   }
+<<<<<<< HEAD
  
+=======
+>>>>>>> 9798d9d2e8b1a8d651f302325d8e511a7fdd4b8e
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
 });
 

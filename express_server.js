@@ -96,11 +96,13 @@ app.get('/login', (req, res) => {
     password: users[req.session.password],
     retype: users[req.session.retype],
   };
+
   if(users[req.session.user_id]){
     res.redirect('/urls')
   }else{
     res.render("urls_login", templateVars);
   }
+
 });
 
 // Adding a new route to input registration and password
@@ -226,7 +228,8 @@ app.post("/login", (req, res) => {
       req.session.user_id = currentUser.id;
       res.redirect("/urls");
       return;
-    }
+    } 
+  
   }
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
 });

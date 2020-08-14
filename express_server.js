@@ -243,8 +243,14 @@ app.post("/logout", (req, res) => {
 // Add a POST route that removes a URL resource, update urls_index.ejs
 app.post("/urls/:shortURL/delete", (req, res) => {
   const urlId = req.params.shortURL;
-  delete urlDatabase[urlId];
-  res.redirect("/urls");
+  const currentUser = users[req.session.user_id];
+  if(!currentUser){
+    res.send("ERROR FOUND: Cannot delete what doesn't belong to you");
+  } else{
+    delete urlDatabase[urlId];
+    res.redirect("/urls");
+  }
+
 });
 
 // Add a post to edit form

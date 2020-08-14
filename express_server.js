@@ -1,3 +1,4 @@
+//Fix check
 const express = require("express");
 const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
@@ -55,63 +56,72 @@ const usersLink = function(object, id) {
   }
   return usersObject;
 };
+app.get('/', (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect('/login');
+    return;
+  } else {
+    res.redirect('/urls');
+    return;
+  }
+});
 
 // add a new route handler for "/urls" and use res.render() to pass the URL data to our template.
 app.get('/urls', (req, res) => {
-
   const id = req.session.user_id;
   const user = id ? users[id] : null;
-
   if (user) {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
-      error:""
+      error: ""
     };
-    
     res.render("urls_index", templateVars);
-
   } else {
     let templateVars = {
       urls: usersLink(urlDatabase, id),
       user,
-      error:"Please login or register as new user...."
+      error: "Please login or register as new user...."
     };
     res.render("urls_index", templateVars);
-    //res.status(403).send("Please login or register first.")
     return;
   }
 });
 
 // Adding a new route to input login email and password
-app.get('/urls/login', (req, res) => {
-
+app.get('/login', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     email: users[req.session.email],
     password: users[req.session.password],
     retype: users[req.session.retype],
   };
-  res.render("urls_login", templateVars);
+  if(users[req.session.user_id]){
+    res.redirect('/urls')
+  }else{
+    res.render("urls_login", templateVars);
+  }
 });
 
 // Adding a new route to input registration and password
-app.get("/urls/register", (req, res) => {
+app.get("/register", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
-  res.render("urls_registration", templateVars);
+  if(users[req.session.user_id]){
+    res.redirect('/urls')
+  }else{
+     res.render("urls_registration", templateVars);
+  }
 });
 
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-
   if (!req.session.user_id) {
-    return res.redirect('login');
+    res.status(401).send("ERROR: You're not log in");
   }
-
   let templateVars = {
     user: users[req.session.user_id],
     username: req.session.username,
@@ -122,138 +132,127 @@ app.get("/urls/new", (req, res) => {
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]["longURL"];
-  if (!longURL) {
-    console.error(`Long URL not found in database!  Make sure that the POST request actually added to the databse`);
-    console.log(urlDatabase);
+  if (!req.session.user_id) {
+    res.status(401).send("ERROR FOUND: This id does not belong to you...");
+    return;
+  } else if (!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("ERROR FOUND: This url does not exist...");
   }
+  if (!urlDatabase[req.params.shortURL]["longURL"]) {
+    res.send('LongURL not found in database!');
+  }
+  const id = req.session.user_id;
+  const links = usersLink(urlDatabase, id);
+
+  if (!links[req.params.shortURL]) {
+    res.status(403).send("ERROR FOUND: This shortURL does not belong to this user......");
+    return;
+  }
+
   let templateVars = {
     user: users[req.session.user_id],
     username: req.session.username,
     shortURL: req.params.shortURL,
-    longURL: longURL
+    longURL: urlDatabase[req.params.shortURL]["longURL"]
   };
   res.render("urls_show", templateVars);
 });
 
 // Redirect back to the website associated to the short url
-app.get(":longURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("ERROR FOUND: This url does not exist...");
+  } else {
+    const longURL = urlDatabase[req.params.shortURL]["longURL"];
+    res.redirect(longURL);
+  }
 });
 
 // Post that add new short url for user
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = genRanId();
-
   urlDatabase[shortURL] = {
     longURL: longURL,
     userID: req.session.user_id
   };
-
   res.redirect('/urls');
 });
 
-app.post('/urls/register', (req, res) => {
-
-  console.log("REGISTER NEW USER");
-
-  const username = req.body.username;
+app.post('/register', (req, res) => {
   const password = req.body.password;
   const retype = req.body.retype;
   const email = req.body.email;
-
   let newId = genRanId();
-
   let newData = {
     id: newId,
     password: bcrypt.hashSync(password, 4),
     retype: bcrypt.hashSync(password, 4),
     email: email
   };
-
-
-  if (!newData.email || !newData.password || !newData.retype) {
-    res.status(400).send("400 ERROR CODE FOUND: please input missing email or password..........");
+  if (!email || !password || !retype) {
+    res.status(400).send("400 ERROR CODE FOUND: Please input missing email or password...");
+    return;
+  } else if (password !== retype) {
+    res.status(400).send("400 ERROR FOUND:Invalid email or password combination...");
+    return;
   }
 
   for (let val in users) {
     if (newData.email === users[val].email) {
-      res.status(400).send("400 ERROR CODE FOUND: This Email already exist, please try again..........");
+      res.status(400).send("400 ERROR CODE FOUND: This email already exist, please try again...");
       return;
     }
   }
-
   users[newId] = newData;
   req.session.user_id = newId;
   res.redirect("/urls");
-  console.log(users);
-
 });
 
 // Add a post login route that enable users to input their info.
-app.post("/urls/login", (req, res) => {
-
+app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const retype = req.body.retype;
-
   if (!email || !password || !retype) {
-
     res.status(403).send("403 ERROR FOUND: Missing a value input.....");
     return;
-
   }
-
   for (let user in users) {
-
     const currentUser = users[user];
     const passEncrypt = bcrypt.compareSync(password, currentUser.password);
     const reEncrypt = bcrypt.compareSync(retype, currentUser.retype);
-
     if (currentUser.email === email && passEncrypt && reEncrypt) {
       req.session.user_id = currentUser.id;
       res.redirect("/urls");
       return;
     }
   }
-
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
-
 });
 
 // Add a post that removes cookie when logged out button is pressed
-app.post("/urls/logout", (req, res) => {
-
-  console.log("LOGGING OUT USER");
+app.post("/logout", (req, res) => {
   req.session = null; // to delete cookies in session library
-  res.redirect("/urls/login");
-
+  res.redirect("/login");
 });
-
 
 // Add a POST route that removes a URL resource, update urls_index.ejs
 app.post("/urls/:shortURL/delete", (req, res) => {
-
-  console.log("DELETE HERE");
   const urlId = req.params.shortURL;
   delete urlDatabase[urlId];
   res.redirect("/urls");
-
 });
 
 // Add a post to edit form
 app.post("/urls/:shortURL", (req, res) => {
-
-  console.log("EDITING Form");
   const shortURL = req.params.shortURL;
   const longURL = req.body.fname;
   updateUrl(shortURL, longURL);
   res.redirect("/urls");
-
 });
 
+// Visual Cue that the server is listening.
 app.listen(PORT, () => {
   console.log(`Tinyapp listening on port ${PORT}!`);
 });

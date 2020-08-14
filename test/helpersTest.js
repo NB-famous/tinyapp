@@ -1,6 +1,7 @@
+//fix check
 const { assert } = require('chai');
 
-const { getUserByEmail } = require('../helper.js');
+const { getUserByEmail } = require('/../helperfunctions/helper.js');
 
 const testUsers = {
   "userRandomID": {

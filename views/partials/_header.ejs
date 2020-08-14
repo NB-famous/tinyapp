@@ -1,8 +1,8 @@
+<!--Testing File-->
 <header>
 
   <style>
-
-    .collapse{
+    .collapse {
       position: relative;
     }
 
@@ -11,75 +11,79 @@
       right: 130px;
       display: inline-block;
       vertical-align: middle;
-   }
+    }
 
-   .btn3 {
-    position: absolute;
-    right: -120px;
-    padding: 2px 7px;
-    top: 0px;
-    border: 2px solid black;
-    border-radius: 5px;
-    width: 100px;
-    height: 40px;
-    opacity: 0.5;
-    color:black;
-    font-size: 20px;
-    cursor: pointer; 
-  }
+    .btn3 {
+      position: absolute;
+      right: -120px;
+      padding: 2px 7px;
+      top: 0px;
+      border: 2px solid black;
+      border-radius: 5px;
+      width: 100px;
+      height: 40px;
+      opacity: 0.5;
+      color: black;
+      font-size: 20px;
+      cursor: pointer;
+    }
 
-   .container2 {
-    position: absolute;
-    right: 130px;
-    display: inline-block;
-    vertical-align: middle;
-  }
+    .container2 {
+      position: absolute;
+      right: 130px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
     .btn4 {
 
       position: absolute;
       right: 0px;
-      margin-top:-40px ;
+      margin-top: -40px;
       margin-right: -120px;
       border: 2px solid black;
       border-radius: 5px;
       width: 100px;
       height: 40px;
       opacity: 0.5;
-      color:black;
+      color: black;
       font-size: 20px;
       cursor: pointer;
-    
-    } 
+
+    }
   </style>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-success">
-      <a class="navbar-brand" href="/urls">TinyApp</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
-          <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/urls/register">New User</a>
+  <nav class="navbar navbar-expand-md navbar-dark bg-success">
+    <a class="navbar-brand" href="/urls">TinyApp</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <!-- <a class="nav-item nav-link" href="/login">Login</a> -->
+        <a class="nav-item nav-link" href="/urls">My URLs</a>
+        
 
-            <% if(!user){ %>
-              <a class="nav-item nav-link" href="/urls/login">Create New URL</a>
-              <div class="container">
-                <form method="GET" action="/urls/login">
-                  <button class="btn3" type="submit">Sign In</button>
-                </form>
-              </div>
-              <% } else{ %>
-              <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-                <div class="container2">
-                  <form method="POST" action="/urls/logout">
-                    <h3><%= user.email %> Is currently logged in!</h3>
-                    <button class="btn4" type="submit">Logout</button>
-                  </form>
-                </div>
-           <% } %>
+        <% if(!user){ %>
+        <a class="nav-item nav-link" href="/register">New User</a>
+        <a class="nav-item nav-link" href="/login">Create New URL</a>
+        <div class="container">
+          <form method="GET" action="/login">
+            <button class="btn3" type="submit">Sign In</button>
+          </form>
         </div>
+        <% } else{ %>
+        <a class="nav-item nav-link" href="/urls">New User</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <div class="container2">
+          <form method="POST" action="/logout">
+            <h3><%= user.email %> Is currently logged in!</h3>
+            <button class="btn4" type="submit">Logout</button>
+          </form>
+        </div>
+        <% } %>
       </div>
-    </nav>
-  </header>
+    </div>
+  </nav>
+</header>

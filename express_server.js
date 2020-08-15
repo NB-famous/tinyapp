@@ -268,8 +268,19 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.fname;
-  updateUrl(shortURL, longURL);
-  res.redirect("/urls");
+
+  const id = req.session.user_id;
+  const links = usersLink(urlDatabase, id);  
+  
+  if(!links[shortURL]){
+    res.send("ERROR FOUND: Unauthorized...");
+    return;
+  } else{
+
+    updateUrl(shortURL, longURL);
+    res.redirect("/urls");
+    return;
+  }
 });
 
 // Visual Cue that the server is listening.

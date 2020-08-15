@@ -183,14 +183,26 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Post that add new short url for user
 app.post("/urls", (req, res) => {
+
+  const currentUser = users[req.session.user_id];
   const longURL = req.body.longURL;
-  const shortURL = genRanId();
-  urlDatabase[shortURL] = {
-    longURL: longURL,
-    userID: req.session.user_id
-  };
+  const shortURL = genRanId();  
+  
+  if(!currentUser){
+    res.send("ERROR FOUND: Unauthorized...");
+    return;
+  } else{
+      urlDatabase[shortURL] = {
+      longURL: longURL,
+      userID: req.session.user_id
+    };
+    res.redirect('/urls');
+    return;
+  }
+
   res.redirect('/urls');
 });
+
 
 app.post('/register', (req, res) => {
   const password = req.body.password;

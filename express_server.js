@@ -46,7 +46,7 @@ const updateUrl = (shortURL, longURL) => {
 };
 
 // Create a function that will tell if its users link or not
-const usersLink = function(object, id) {
+const usersLink = function (object, id) {
   let usersObject = {};
   for (let key in object) {
     if (object[key].userID === id) {
@@ -55,6 +55,7 @@ const usersLink = function(object, id) {
   }
   return usersObject;
 };
+
 app.get('/', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/login');
@@ -95,13 +96,11 @@ app.get('/login', (req, res) => {
     password: users[req.session.password],
     retype: users[req.session.retype],
   };
-
-  if(users[req.session.user_id]){
+  if (users[req.session.user_id]) {
     res.redirect('/urls')
-  }else{
+  } else {
     res.render("urls_login", templateVars);
   }
-
 });
 
 // Adding a new route to input registration and password
@@ -111,27 +110,25 @@ app.get("/register", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
-  if(users[req.session.user_id]){
+  if (users[req.session.user_id]) {
     res.redirect('/urls')
-  }else{
-     res.render("urls_registration", templateVars);
+  } else {
+    res.render("urls_registration", templateVars);
   }
 });
 
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-  
   const id = req.session.user_id;
   const currentUser = users[req.session.user_id];
-
   if (!id) {
     res.status(401).send("ERROR: You're not log in");
   }
   console.log(currentUser)
-  if(!currentUser){
+  if (!currentUser) {
     res.send("ERROR FOUND: Unauthorized user cannot proceed with this action");
     return;
-  } else{
+  } else {
     let templateVars = {
       user: users[req.session.user_id],
       username: req.session.username,
@@ -139,7 +136,6 @@ app.get("/urls/new", (req, res) => {
     };
     res.render("urls_new", templateVars);
   }
-
 });
 
 // Adding a new route
@@ -161,7 +157,6 @@ app.get("/urls/:shortURL", (req, res) => {
     res.status(403).send("ERROR FOUND: This shortURL does not belong to this user......");
     return;
   }
-
   let templateVars = {
     user: users[req.session.user_id],
     username: req.session.username,
@@ -183,26 +178,22 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Post that add new short url for user
 app.post("/urls", (req, res) => {
-
   const currentUser = users[req.session.user_id];
   const longURL = req.body.longURL;
-  const shortURL = genRanId();  
-  
-  if(!currentUser){
+  const shortURL = genRanId();
+  if (!currentUser) {
     res.send("ERROR FOUND: Unauthorized...");
     return;
-  } else{
-      urlDatabase[shortURL] = {
+  } else {
+    urlDatabase[shortURL] = {
       longURL: longURL,
       userID: req.session.user_id
     };
     res.redirect('/urls');
     return;
   }
-
   res.redirect('/urls');
 });
-
 
 app.post('/register', (req, res) => {
   const password = req.body.password;
@@ -250,7 +241,7 @@ app.post("/login", (req, res) => {
       req.session.user_id = currentUser.id;
       res.redirect("/urls");
       return;
-    } 
+    }
   }
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
 });
@@ -265,11 +256,11 @@ app.post("/logout", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const urlId = req.params.shortURL;
   const id = req.session.user_id;
-  const links = usersLink(urlDatabase, id);  
-  if(!links[urlId]){
+  const links = usersLink(urlDatabase, id);
+  if (!links[urlId]) {
     res.send("ERROR FOUND: Cannot delete what doesn't belong to you");
     return;
-  } else{
+  } else {
     delete urlDatabase[urlId];
     res.redirect('/urls');
     return;
@@ -282,12 +273,12 @@ app.post("/urls/:shortURL", (req, res) => {
   const longURL = req.body.fname;
 
   const id = req.session.user_id;
-  const links = usersLink(urlDatabase, id);  
-  
-  if(!links[shortURL]){
+  const links = usersLink(urlDatabase, id);
+
+  if (!links[shortURL]) {
     res.send("ERROR FOUND: Unauthorized...");
     return;
-  } else{
+  } else {
 
     updateUrl(shortURL, longURL);
     res.redirect("/urls");

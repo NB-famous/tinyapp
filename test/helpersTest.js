@@ -1,4 +1,3 @@
-//fix check
 const { assert } = require('chai');
 
 const { getUserByEmail } = require('/../helperfunctions/helper.js');

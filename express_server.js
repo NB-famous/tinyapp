@@ -124,7 +124,6 @@ app.get("/urls/new", (req, res) => {
   if (!id) {
     res.status(401).send("ERROR: You're not log in");
   }
-  console.log(currentUser)
   if (!currentUser) {
     res.send("ERROR FOUND: Unauthorized user cannot proceed with this action");
     return;

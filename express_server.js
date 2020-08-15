@@ -1,4 +1,3 @@
-//Fix check
 const express = require("express");
 const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
@@ -142,6 +141,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   if (!urlDatabase[req.params.shortURL]["longURL"]) {
     res.send('LongURL not found in database!');
+    return;
   }
   const id = req.session.user_id;
   const links = usersLink(urlDatabase, id);
@@ -199,7 +199,6 @@ app.post('/register', (req, res) => {
     res.status(400).send("400 ERROR FOUND:Invalid email or password combination...");
     return;
   }
-
   for (let val in users) {
     if (newData.email === users[val].email) {
       res.status(400).send("400 ERROR CODE FOUND: This email already exist, please try again...");
@@ -229,7 +228,6 @@ app.post("/login", (req, res) => {
       res.redirect("/urls");
       return;
     } 
-  
   }
   res.status(403).send("403 ERROR FOUND:Invalid email or password combination......");
 });
@@ -243,14 +241,15 @@ app.post("/logout", (req, res) => {
 // Add a POST route that removes a URL resource, update urls_index.ejs
 app.post("/urls/:shortURL/delete", (req, res) => {
   const urlId = req.params.shortURL;
-  const currentUser = users[req.session.user_id];
-  if(!currentUser){
+  const id = req.session.user_id;
+  const links = usersLink(urlDatabase, id);  
+  if(!links[urlId]){
     res.send("ERROR FOUND: Cannot delete what doesn't belong to you");
+    return;
   } else{
     delete urlDatabase[urlId];
-    res.redirect("/urls");
+    return;
   }
-
 });
 
 // Add a post to edit form

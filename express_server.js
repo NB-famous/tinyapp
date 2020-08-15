@@ -120,21 +120,32 @@ app.get("/register", (req, res) => {
 
 // Adding a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-  if (!req.session.user_id) {
+  
+  const id = req.session.user_id;
+  const currentUser = users[req.session.user_id];
+
+  if (!id) {
     res.status(401).send("ERROR: You're not log in");
   }
-  let templateVars = {
-    user: users[req.session.user_id],
-    username: req.session.username,
-    urls: urlDatabase
-  };
-  res.render("urls_new", templateVars);
+  console.log(currentUser)
+  if(!currentUser){
+    res.send("ERROR FOUND: Unauthorized user cannot proceed with this action");
+    return;
+  } else{
+    let templateVars = {
+      user: users[req.session.user_id],
+      username: req.session.username,
+      urls: urlDatabase
+    };
+    res.render("urls_new", templateVars);
+  }
+
 });
 
 // Adding a new route
 app.get("/urls/:shortURL", (req, res) => {
   if (!req.session.user_id) {
-    res.status(401).send("ERROR FOUND: This id does not belong to you...");
+    res.status(401).send("ERROR FOUND: Unauthorised user...");
     return;
   } else if (!urlDatabase[req.params.shortURL]) {
     res.status(404).send("ERROR FOUND: This url does not exist...");
@@ -248,6 +259,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     return;
   } else{
     delete urlDatabase[urlId];
+    res.redirect('/urls');
     return;
   }
 });
